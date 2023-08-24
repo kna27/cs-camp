@@ -1,18 +1,20 @@
 const express = require("express");
+const multer = require("multer");
 const Handlebars = require("hbs");
 const fs = require("fs");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 var postcssMiddleware = require('postcss-middleware');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/css', postcssMiddleware({
-    src: () => "**/**.html",
+    src: () => "**/**.hbs",
     plugins: []
 
 }));
-
 
 const getData = () => {
     return JSON.parse(fs.readFileSync("data.json"));
@@ -21,6 +23,7 @@ const getData = () => {
 const updateData = (data) => {
     fs.writeFileSync("data.json", JSON.stringify(data));
 }
+
 Handlebars.registerPartials(__dirname + "/views/partials/", (error) => { if (error) throw error });
 app.set("view engine", "hbs");
 
@@ -40,6 +43,12 @@ app.post('/login', (req, res) => {
     if (username == "admin" && password == ADMIN_PASSWORD) {
         return res.render("admin", { families: getData().families });
     }
+    
+    let data = getData();
+    let family = data.families.find((family) => family.name == username);
+    if (family && family.password == password) {
+        return res.render("family", { family: family });
+    }
     return res.redirect("/");
 });
 
@@ -54,6 +63,10 @@ app.post("/admin", (req, res) => {
     return res.render("admin", { families: getData().families });
 });
 
+// TODO app.post /family
+// app.post("/family",upload.any('files'),(req, res) => {
+//     return res.render("family", { family: getData().families.find((family) => family.name == req.body.family) });
+// });
 
 app.get("/api/leaderboard", (req, res) => {
     let points = {};
@@ -65,8 +78,6 @@ app.get("/api/leaderboard", (req, res) => {
     return res.json(points);
 });
 
-
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Listening at http://localhost:${PORT}`);
 });

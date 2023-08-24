@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/dist/output.css" rel="stylesheet">
+    <title>Admin | BCA CS Camp</title>
+</head>
+<body>
+    <h1>Family Leader Panel</h1>
+    <h2>{{family.name}}</h2>
+    <h2>{{family.points}} Points</h2>
+    <form action="/family?family={{family.name}}" method="POST" enctype="multipart/form-data">
+        <h3>Upload Scavenger Hunt Pictures</h3>
+        <input type="file" name="scavenger_hunt" accept="image/*" multiple>
+        <div id="scavenger-hunt-preview"></div>
+        <button type="submit">Update</button>
+    </form>
+    <a href="/">Home</a>
+</body>
+<script>
+    document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function() {
+        let preview = document.querySelector('#scavenger-hunt-preview');
+        preview.innerHTML = '';
+        for (const file of this.files) {
+            let img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            preview.appendChild(img);
+        }
+    });
+</script>
+</html>
