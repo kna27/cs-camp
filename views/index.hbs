@@ -7,18 +7,31 @@
     <title>BCA CS Camp</title>
 </head>
 <body>
-    <h1 class="w-full bg-pink-500">BCA CS Camp</h1>
-    <div>
-        <div>
-            Home
-        </div>
-        <div>
-            Scavenger Hunt Pictures
-        </div>
-        <div>
-            Leaderboard
-        </div>
-        
-    </div>
+    <h1>BCA CS Camp</h1>
+    <h2>Schedule</h2>
+    <h2>Leaderboard</h2>
+    <div id="leaderboard"></div>
+    <h3>Staff Login</h3>
+    <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <button type="submit">Login</button>
+    </form>
 </body>
+<script>
+function updateLeaderboard() {
+    fetch('/api/leaderboard')
+        .then(response => response.json())
+        .then(data => {
+                document.querySelector('#leaderboard').innerHTML = '';
+                for (const [key, value] of Object.entries(data)) {
+                    let familyDiv = document.createElement('div');
+                    familyDiv.innerHTML = `<h3>${key}</h3><p>${value}</p>`;
+                    document.querySelector('#leaderboard').appendChild(familyDiv);
+                }
+        });
+}
+updateLeaderboard();
+setInterval(updateLeaderboard, 5000);
+</script>
 </html>
