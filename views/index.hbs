@@ -10,6 +10,28 @@
 <body>
     <h1>BCA CS Camp</h1>
     <h2>Schedule</h2>
+    {{#each schedule}}
+    <h3>{{@key}}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Activity</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each this}}
+            <tr>
+                <td>{{this.time}}</td>
+                <td>{{this.activity}}</td>
+                <td>{{this.location}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+{{/each}}
+
     <h2>Leaderboard</h2>
     <div id="leaderboard"></div>
     <h3>Staff Login</h3>

@@ -52,16 +52,13 @@ const upload = multer({ storage: storage });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
-Handlebars.registerPartials(__dirname + "/views/partials/", (error) => { if (error) throw error });
 app.set("view engine", "hbs");
 
 
 ADMIN_PASSWORD = getData().admin_pw;
 
 app.get('/', (req, res) => {
-    return res.render("index");
+    return res.render("index", getData());
 });
 
 app.post('/login', async (req, res) => {
