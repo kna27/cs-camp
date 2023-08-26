@@ -1,0 +1,41 @@
+{
+    "schedule": {
+        "Day 1": [
+            {
+                "time": "9:00 - 10:00",
+                "activity": "Activity name",
+                "location": "Room #"
+            },
+            {
+                "time": "10:00 - 11:00",
+                "activity": "Another activity name",
+                "location": "Room #"
+            }
+        ],
+        "Day 2": [
+            {
+                "time": "9:30 - 10:30",
+                "activity": "Activity name",
+                "location": "Room #"
+            },
+            {
+                "time": "10:30 - 11:15",
+                "activity": "Another activity name",
+                "location": "Room #"
+            }
+        ]
+    },
+    "families": [
+        {
+            "name": "Family 1",
+            "points": 0,
+            "password": "pleasechangethis1"
+        },
+        {
+            "name": "Family 2",
+            "points": 0,
+            "password": "pleasechangethis2"
+        }
+    ],
+    "admin_pw": "supersecretadminpassword"
+}
