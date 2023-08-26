@@ -3,33 +3,36 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <title>Admin | BCA CS Camp</title>
 </head>
 
-<body>
-    <h1>Admin Panel</h1>
+<body class="content has-text-centered">
+    <h1 class="title is-2">Admin Panel</h1>
     <form action="/admin" method="POST">
-        <h2>Families</h2>
-        {{#each families}}
-            <div>
-                <h3>{{name}}</h3>
-                <p>Password: <span class="password-reveal" data-password="{{password}}">••••••••</span></p>
-                <input type="number" name="points_{{name}}" value="{{points}}">
+        <button type="submit" class="button is-primary">Update Points</button>
+        <div class="family-container">
+            {{#each families}}
+                <div class="family block pb-5">
+                    <h3 class="mt-3">{{name}}</h3>
+                    <p>Password: <span class="password-reveal" data-password="{{password}}">••••••••</span></p>
+                    <input type="number" class="input" style="width: 10vw" name="points_{{name}}" value="{{points}}">
 
-                <div class="family-images">
-                    <h4>Uploaded Images</h4>
-                    {{#each images}}
-                        <div class="image-container">
-                            <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image">
-                            <button class="delete-image" data-family="{{../name}}" data-image="{{this}}">Delete</button>
-                        </div>
-                    {{/each}}
+                    <div class="family-images mt-5">
+                        <h4>Scavenger Hunt Pictures</h4>
+                        {{#each images}}
+                            <div class="image-container">
+                                <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image" class="scav-hunt-img">
+                                <button class="delete-image button is-danger is-small" data-family="{{../name}}" data-image="{{this}}">Delete</button>
+                            </div>
+                        {{/each}}
+                    </div>
                 </div>
-            </div>
-        {{/each}}
-        <button type="submit">Update</button>
+            {{/each}}
+        </div>
     </form>
     <a href="/">Home</a>
 </body>

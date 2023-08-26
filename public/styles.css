@@ -1,3 +1,36 @@
 .password-reveal {
     cursor: pointer;
 }
+
+section {
+    text-align: center;
+}
+
+section * {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.family {
+    flex: 1;
+    margin: 0.75em;
+    outline: 1px solid black;
+    border-radius: 15px;
+}
+
+.family-container {
+    display: flex;
+}
+
+.scav-hunt-img {
+    width: 95%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
