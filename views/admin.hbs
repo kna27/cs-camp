@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
     <title>Admin | BCA CS Camp</title>
 </head>
+
 <body>
     <h1>Admin Panel</h1>
     <form action="/admin" method="POST">
@@ -12,12 +15,75 @@
         {{#each families}}
             <div>
                 <h3>{{name}}</h3>
-                <p>Password: {{password}}</p>
+                <p>Password: <span class="password-reveal" data-password="{{password}}">••••••••</span></p>
                 <input type="number" name="points_{{name}}" value="{{points}}">
+
+                <div class="family-images">
+                    <h4>Uploaded Images</h4>
+                    {{#each images}}
+                        <div class="image-container">
+                            <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image">
+                            <button class="delete-image" data-family="{{../name}}" data-image="{{this}}">Delete</button>
+                        </div>
+                    {{/each}}
+                </div>
             </div>
         {{/each}}
         <button type="submit">Update</button>
     </form>
     <a href="/">Home</a>
 </body>
+<script>
+    document.addEventListener('mouseover', function (e) {
+        if (e.target.classList.contains('password-reveal')) {
+            const password = e.target.getAttribute('data-password');
+            e.target.textContent = password;
+        }
+    });
+
+    document.addEventListener('mouseout', function (e) {
+        if (e.target.classList.contains('password-reveal') && !e.target.getAttribute('data-clicked')) {
+            e.target.textContent = '••••••••';
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('password-reveal')) {
+            if (e.target.getAttribute('data-clicked')) {
+                e.target.textContent = '••••••••';
+                e.target.removeAttribute('data-clicked');
+            } else {
+                e.target.textContent = e.target.getAttribute('data-password');
+                e.target.setAttribute('data-clicked', true);
+            }
+        }
+    });
+    document.addEventListener('click', async function (e) {
+        if (e.target.classList.contains('delete-image')) {
+            e.preventDefault();
+
+            const imageName = e.target.getAttribute('data-image');
+            const familyName = e.target.getAttribute('data-family');
+
+            try {
+                const response = await fetch(`/delete-image?family=${familyName}&image=${imageName}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    const imageContainer = e.target.closest('.image-container');
+                    if (imageContainer) {
+                        imageContainer.remove();
+                    }
+                } else {
+                    console.error('Failed to delete the image');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    });
+
+</script>
+
 </html>

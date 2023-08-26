@@ -8,6 +8,24 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+
+const getData = () => {
+    return JSON.parse(fs.readFileSync("data.json"));
+}
+
+const updateData = (data) => {
+    fs.writeFileSync("data.json", JSON.stringify(data));
+}
+
+
+const families = getData().families;
+families.forEach(family => {
+    const directoryPath = path.join(__dirname, 'scavenger_hunt', family.name);
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+});
+
 app.use(express.static(__dirname + "/public"));
 app.use('/scavenger_hunt', express.static(path.join(__dirname, 'scavenger_hunt')));
 
@@ -35,13 +53,6 @@ const upload = multer({ storage: storage });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const getData = () => {
-    return JSON.parse(fs.readFileSync("data.json"));
-}
-
-const updateData = (data) => {
-    fs.writeFileSync("data.json", JSON.stringify(data));
-}
 
 Handlebars.registerPartials(__dirname + "/views/partials/", (error) => { if (error) throw error });
 app.set("view engine", "hbs");
@@ -58,9 +69,19 @@ app.post('/login', async (req, res) => {
     let password = req.body.password;
 
     if (username == "admin" && password == ADMIN_PASSWORD) {
-        return res.render("admin", { families: getData().families });
+        let families = getData().families;
+        for (let family of families) {
+            const familyDir = path.join(__dirname, 'scavenger_hunt', family.name);
+            try {
+                family.images = fs.readdirSync(familyDir);
+            } catch (error) {
+                console.error(`Error reading directory for ${family.name}:`, error);
+                family.images = [];
+            }
+        }
+        return res.render("admin", { families: families });
     }
-    
+
     let data = getData();
     let family = data.families.find((family) => family.name == username);
     if (family && family.password == password) {
@@ -85,7 +106,17 @@ app.post("/admin", (req, res) => {
         }
     });
     updateData(data);
-    return res.render("admin", { families: getData().families });
+    let families = getData().families;
+    for (let family of families) {
+        const familyDir = path.join(__dirname, 'scavenger_hunt', family.name);
+        try {
+            family.images = fs.readdirSync(familyDir);
+        } catch (error) {
+            console.error(`Error reading directory for ${family.name}:`, error);
+            family.images = [];
+        }
+    }
+    return res.render("admin", { families: families });
 });
 
 app.post("/family", upload.array('scavenger_hunt'), async (req, res) => {
@@ -106,6 +137,24 @@ app.post("/family", upload.array('scavenger_hunt'), async (req, res) => {
     }
 
     res.render("family", { family: family, images: images });
+});
+
+app.delete('/delete-image', async (req, res) => {
+    const familyName = req.query.family;
+    const imageName = req.query.image;
+    if (!familyName || !imageName) {
+        return res.status(400).send('Bad Request');
+    }
+
+    const imagePath = path.join(__dirname, 'scavenger_hunt', familyName, imageName);
+
+    try {
+        await fsExtra.remove(imagePath);
+        res.status(200).send('Image deleted successfully');
+    } catch (error) {
+        console.error('Error deleting the image:', error);
+        res.status(500).send('Server error');
+    }
 });
 
 app.get("/api/leaderboard", (req, res) => {

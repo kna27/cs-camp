@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/dist/output.css" rel="stylesheet">
     <title>BCA CS Camp</title>
 </head>
+
 <body>
     <h1>BCA CS Camp</h1>
     <h2>Schedule</h2>
@@ -19,19 +20,20 @@
     </form>
 </body>
 <script>
-function updateLeaderboard() {
-    fetch('/api/leaderboard')
-        .then(response => response.json())
-        .then(data => {
+    function updateLeaderboard() {
+        fetch('/api/leaderboard')
+            .then(response => response.json())
+            .then(data => {
                 document.querySelector('#leaderboard').innerHTML = '';
                 for (const [key, value] of Object.entries(data)) {
                     let familyDiv = document.createElement('div');
                     familyDiv.innerHTML = `<h3>${key}</h3><p>${value}</p>`;
                     document.querySelector('#leaderboard').appendChild(familyDiv);
                 }
-        });
-}
-updateLeaderboard();
-setInterval(updateLeaderboard, 5000);
+            });
+    }
+    updateLeaderboard();
+    setInterval(updateLeaderboard, 5000);
 </script>
+
 </html>

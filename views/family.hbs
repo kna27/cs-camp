@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | BCA CS Camp</title>
 </head>
+
 <body>
     <h1>Family Leader Panel</h1>
     <h2>{{family.name}}</h2>
-    <h2>{{family.points}} Points</h2>  
+    <h2>{{family.points}} Points</h2>
     <div id="uploaded-images">
         <h3>Previously Uploaded Images</h3>
         {{#each images}}
-            <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
+            <div class="image-container">
+                <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
+                <button class="delete-image" data-image="{{this}}">Delete</button>
+            </div>
         {{/each}}
     </div>
     <form action="/family?family={{family.name}}" method="POST" enctype="multipart/form-data">
@@ -24,7 +29,7 @@
     <a href="/">Home</a>
 </body>
 <script>
-    document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function() {
+    document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function () {
         let preview = document.querySelector('#scavenger-hunt-preview');
         preview.innerHTML = '';
         for (const file of this.files) {
@@ -33,5 +38,31 @@
             preview.appendChild(img);
         }
     });
+    document.addEventListener('click', async function (e) {
+        if (e.target.classList.contains('delete-image')) {
+            const imageName = e.target.getAttribute('data-image');
+            const familyName = '{{family.name}}';
+
+            try {
+                // Make a request to the server to delete the image
+                const response = await fetch(`/delete-image?family=${familyName}&image=${imageName}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    // Remove the image and button from the DOM
+                    const imageContainer = e.target.closest('.image-container');
+                    if (imageContainer) {
+                        imageContainer.remove();
+                    }
+                } else {
+                    console.error('Failed to delete the image');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    });
 </script>
+
 </html>
