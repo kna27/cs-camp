@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/dist/output.css" rel="stylesheet">
     <title>Admin | BCA CS Camp</title>
 </head>
 <body>
     <h1>Family Leader Panel</h1>
     <h2>{{family.name}}</h2>
-    <h2>{{family.points}} Points</h2>
+    <h2>{{family.points}} Points</h2>  
+    <div id="uploaded-images">
+        <h3>Previously Uploaded Images</h3>
+        {{#each images}}
+            <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
+        {{/each}}
+    </div>
     <form action="/family?family={{family.name}}" method="POST" enctype="multipart/form-data">
         <h3>Upload Scavenger Hunt Pictures</h3>
         <input type="file" name="scavenger_hunt" accept="image/*" multiple>

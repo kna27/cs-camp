@@ -1,20 +1,39 @@
 const express = require("express");
 const multer = require("multer");
+const fsExtra = require('fs-extra');
 const Handlebars = require("hbs");
 const fs = require("fs");
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-var postcssMiddleware = require('postcss-middleware');
+app.use(express.static(__dirname + "/public"));
+app.use('/scavenger_hunt', express.static(path.join(__dirname, 'scavenger_hunt')));
+
+const storage = multer.diskStorage({
+    destination: async function (req, file, cb) {
+        const dest = path.join(__dirname, 'scavenger_hunt', req.query.family);
+        try {
+            await fsExtra.ensureDir(dest);
+            cb(null, dest);
+        } catch (error) {
+            cb(error, null);
+        }
+    },
+    filename: function (req, file, cb) {
+        const timestamp = Date.now();
+        const extension = path.extname(file.originalname);
+        const baseName = path.basename(file.originalname, extension);
+        const newFilename = `${baseName}-${timestamp}${extension}`;
+        cb(null, newFilename);
+    }
+});
+
+const upload = multer({ storage: storage });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/css', postcssMiddleware({
-    src: () => "**/**.hbs",
-    plugins: []
-
-}));
 
 const getData = () => {
     return JSON.parse(fs.readFileSync("data.json"));
@@ -27,8 +46,6 @@ const updateData = (data) => {
 Handlebars.registerPartials(__dirname + "/views/partials/", (error) => { if (error) throw error });
 app.set("view engine", "hbs");
 
-app.use(express.static(__dirname + "/public"));
-
 
 ADMIN_PASSWORD = getData().admin_pw;
 
@@ -36,7 +53,7 @@ app.get('/', (req, res) => {
     return res.render("index");
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
 
@@ -47,7 +64,15 @@ app.post('/login', (req, res) => {
     let data = getData();
     let family = data.families.find((family) => family.name == username);
     if (family && family.password == password) {
-        return res.render("family", { family: family });
+        let images;
+        try {
+            let imagesDir = path.join(__dirname, 'scavenger_hunt', username);
+            images = await fsExtra.readdir(imagesDir);
+        } catch (error) {
+            console.error('Error reading files:', error);
+            return res.status(500).send('Server error');
+        }
+        return res.render("family", { family: family, images: images });
     }
     return res.redirect("/");
 });
@@ -63,10 +88,25 @@ app.post("/admin", (req, res) => {
     return res.render("admin", { families: getData().families });
 });
 
-// TODO app.post /family
-// app.post("/family",upload.any('files'),(req, res) => {
-//     return res.render("family", { family: getData().families.find((family) => family.name == req.body.family) });
-// });
+app.post("/family", upload.array('scavenger_hunt'), async (req, res) => {
+    let familyName = req.query.family;
+    let imagesDir = path.join(__dirname, 'scavenger_hunt', familyName);
+    let images;
+    try {
+        images = await fsExtra.readdir(imagesDir);
+    } catch (error) {
+        console.error('Error reading files:', error);
+        return res.status(500).send('Server error');
+    }
+    let data = getData();
+    let family = data.families.find(f => f.name === familyName);
+
+    if (!family) {
+        return res.redirect("/");
+    }
+
+    res.render("family", { family: family, images: images });
+});
 
 app.get("/api/leaderboard", (req, res) => {
     let points = {};
