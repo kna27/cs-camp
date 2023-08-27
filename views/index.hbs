@@ -3,57 +3,120 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>BCA CS Camp</title>
 </head>
 
-<body>
-    <h1>BCA CS Camp</h1>
-    <h2>Schedule</h2>
-    {{#each schedule}}
-    <h3>{{@key}}</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Time</th>
-                <th>Activity</th>
-                <th>Location</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each this}}
-            <tr>
-                <td>{{this.time}}</td>
-                <td>{{this.activity}}</td>
-                <td>{{this.location}}</td>
-            </tr>
+<body class="content has-text-centered">
+    <h1 class="title is-2">BCA CS Camp</h1>
+    <div class="holder">
+        <div class="leaderboard-container">
+            <h2 class="subtitle is-2">Leaderboard</h2>
+            <canvas id="leaderboardChart" width="400" height="400"></canvas>
+        </div>
+        <div class="schedule-container">
+            <h2 class="subtitle is-2">Schedule</h2>
+            {{#each schedule}}
+                <h3>{{@key}}</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Activity</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each this}}
+                            <tr>
+                                <td>{{this.time}}</td>
+                                <td>{{this.activity}}</td>
+                                <td>{{this.location}}</td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
             {{/each}}
-        </tbody>
-    </table>
-{{/each}}
-
-    <h2>Leaderboard</h2>
-    <div id="leaderboard"></div>
-    <h3>Staff Login</h3>
-    <form action="/login" method="POST">
-        <input type="text" name="username" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
-        <button type="submit">Login</button>
-    </form>
+        </div>
+    </div>
+    <footer class="footer has-text-right">
+        <h3>Staff Login</h3>
+        <form action="/login" method="POST">
+            <input type="text" name="username" placeholder="Username">
+            <input type="password" name="password" placeholder="Password">
+            <button type="submit" class="button">Login</button>
+        </form>
+    </footer>
 </body>
 <script>
+    let leaderboardChart;
+    let lbData;
     function updateLeaderboard() {
         fetch('/api/leaderboard')
             .then(response => response.json())
             .then(data => {
-                document.querySelector('#leaderboard').innerHTML = '';
-                for (const [key, value] of Object.entries(data)) {
-                    let familyDiv = document.createElement('div');
-                    familyDiv.innerHTML = `<h3>${key}</h3><p>${value}</p>`;
-                    document.querySelector('#leaderboard').appendChild(familyDiv);
+                if (JSON.stringify(data) === JSON.stringify(lbData)) {
+                    return;
                 }
+                lbData = data;
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+
+                const ctx = document.getElementById('leaderboardChart').getContext('2d');
+
+                if (leaderboardChart) {
+                    leaderboardChart.destroy();
+                }
+
+                leaderboardChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Points',
+                            data: values,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 20
+                                    }
+                                }
+                            },
+                        },
+                        plugins: {
+                            legend: false,
+                        },
+                        animation: {
+                            duration: 0
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                });
             });
     }
+
     updateLeaderboard();
     setInterval(updateLeaderboard, 5000);
 </script>

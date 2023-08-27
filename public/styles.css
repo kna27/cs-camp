@@ -56,3 +56,18 @@ table {
     height: 80%;
     display: flex;
 }
+
+.holder {
+    display: flex;
+    margin: 1vw;
+}
+
+.leaderboard-container {
+    flex: 7;
+    max-height: 80vh;
+
+}
+
+.schedule-container {
+    flex: 3;
+}
