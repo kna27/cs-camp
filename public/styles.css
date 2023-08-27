@@ -34,3 +34,25 @@ table {
     margin-left: auto;
     margin-right: auto;
 }
+
+#scavenger-hunt-preview, #uploaded-images {
+    width: 75vw;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: #f1f1f1;
+    border-radius: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#scavenger-hunt-preview img, #uploaded-images div {
+    height: 10vw;
+    object-fit: cover;
+    margin: 0.5vw;
+}
+
+#uploaded-images div img {
+    height: 80%;
+    display: flex;
+}

@@ -3,29 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | BCA CS Camp</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <title>Family Leader | BCA CS Camp</title>
 </head>
 
-<body>
-    <h1>Family Leader Panel</h1>
-    <h2>{{family.name}}</h2>
-    <h2>{{family.points}} Points</h2>
-    <div id="uploaded-images">
-        <h3>Previously Uploaded Images</h3>
+<body class="content has-text-centered">
+    <h1 class="title is-2">Family Leader Panel</h1>
+    <h2 class="subtitle is-3">{{family.name}} | {{family.points}} Points</h2>
+    <form action="/family?family={{family.name}}" method="POST" enctype="multipart/form-data">
+        <h3>Upload Scavenger Hunt Pictures</h3>
+        <input type="file" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw" multiple>
+        <div id="scavenger-hunt-preview" class="mt-5 mb-3"></div>
+        <button type="submit" class="button is-primary">Upload</button>
+    </form>
+    <h3 class="mt-3">Previously Uploaded Images</h3>
+    <div id="uploaded-images" class="mb-5">
         {{#each images}}
             <div class="image-container">
                 <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
-                <button class="delete-image" data-image="{{this}}">Delete</button>
+                <button class="delete-image button is-danger is-small" data-image="{{this}}">Delete</button>
             </div>
         {{/each}}
     </div>
-    <form action="/family?family={{family.name}}" method="POST" enctype="multipart/form-data">
-        <h3>Upload Scavenger Hunt Pictures</h3>
-        <input type="file" name="scavenger_hunt" accept="image/*" multiple>
-        <div id="scavenger-hunt-preview"></div>
-        <button type="submit">Update</button>
-    </form>
     <a href="/">Home</a>
 </body>
 <script>
@@ -42,15 +44,11 @@
         if (e.target.classList.contains('delete-image')) {
             const imageName = e.target.getAttribute('data-image');
             const familyName = '{{family.name}}';
-
             try {
-                // Make a request to the server to delete the image
                 const response = await fetch(`/delete-image?family=${familyName}&image=${imageName}`, {
                     method: 'DELETE'
                 });
-
                 if (response.ok) {
-                    // Remove the image and button from the DOM
                     const imageContainer = e.target.closest('.image-container');
                     if (imageContainer) {
                         imageContainer.remove();
