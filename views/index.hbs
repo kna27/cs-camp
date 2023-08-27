@@ -18,30 +18,32 @@
             <h2 class="subtitle is-3">Leaderboard</h2>
             <canvas id="leaderboardChart" width="400" height="400"></canvas>
         </div>
-        <div class="schedule-container">
-            <h2 class="subtitle is-3">Schedule</h2>
-            {{#each schedule}}
-                <h3>{{@key}}</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Activity</th>
-                            <th>Location</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each this}}
+        {{#if schedule}}
+            <div class="schedule-container">
+                <h2 class="subtitle is-3">Schedule</h2>
+                {{#each schedule}}
+                    <h3>{{@key}}</h3>
+                    <table>
+                        <thead>
                             <tr>
-                                <td>{{this.time}}</td>
-                                <td>{{this.activity}}</td>
-                                <td>{{this.location}}</td>
+                                <th>Time</th>
+                                <th>Activity</th>
+                                <th>Location</th>
                             </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-            {{/each}}
-        </div>
+                        </thead>
+                        <tbody>
+                            {{#each this}}
+                                <tr>
+                                    <td>{{this.time}}</td>
+                                    <td>{{this.activity}}</td>
+                                    <td>{{this.location}}</td>
+                                </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                {{/each}}
+            </div>
+        {{/if}}
     </div>
     <footer class="footer has-text-right">
         <h3>Staff Login</h3>
@@ -62,6 +64,11 @@
                 if (JSON.stringify(data) === JSON.stringify(lbData)) {
                     return;
                 }
+                if (Object.keys(data).length === 0) {
+                    document.querySelector('.leaderboard-container').style.display = 'none';
+                    return;
+                }
+                document.querySelector('.leaderboard-container').style.display = 'block';
                 lbData = data;
                 const labels = Object.keys(data);
                 const values = Object.values(data);

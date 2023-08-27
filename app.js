@@ -8,6 +8,34 @@ const getData = () => JSON.parse(fs.readFileSync("data.json"));
 
 const updateData = (data) => fs.writeFileSync("data.json", JSON.stringify(data));
 
+const consoleError = (message) => {
+    console.error("\x1b[31m%s\x1b[0m", `ERROR: ${message}`);
+    process.exit(1);
+}
+
+const consoleWarn = (message) => {
+    console.warn("\x1b[33m%s\x1b[0m", `WARNING: ${message}`);
+}
+
+// Startup checks
+if (!fs.existsSync("data.json")) {
+    consoleError("data.json does not exist");
+}
+try {
+    JSON.parse(fs.readFileSync("data.json"));
+} catch (error) {
+    consoleError("data.json is not valid JSON");
+}
+if (!getData().admin_pw) {
+    consoleError("Admin password is not set");
+}
+if (!getData().families || getData().families.length == 0) {
+    consoleWarn("No families are set, if this is intentional, ignore this");
+}
+if (!getData().schedule || Object.keys(getData().schedule).length === 0) {
+    consoleWarn("Schedule does not exist or is empty, if this is intentional, ignore this");
+}
+
 const getFamilyImages = (familyName) => {
     const familyDir = path.join(__dirname, "scavenger_hunt", familyName);
     try {
@@ -20,12 +48,14 @@ const getFamilyImages = (familyName) => {
 
 // Create scavenger hunt directories for each family
 let families = getData().families;
-families.forEach(family => {
-    const directoryPath = path.join(__dirname, "scavenger_hunt", family.name);
-    if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath, { recursive: true });
-    }
-});
+if (families) {
+    families.forEach(family => {
+        const directoryPath = path.join(__dirname, "scavenger_hunt", family.name);
+        if (!fs.existsSync(directoryPath)) {
+            fs.mkdirSync(directoryPath, { recursive: true });
+        }
+    });
+}
 
 // Multer storage setup
 const storage = multer.diskStorage({
@@ -72,23 +102,30 @@ app.post("/login", async (req, res) => {
     // Admin login
     if (username == "admin" && password == ADMIN_PASSWORD) {
         let data = getData();
-        data.families.forEach(family => family.images = getFamilyImages(family.name));
+        if (data.families) {
+            data.families.forEach(family => family.images = getFamilyImages(family.name));
+        }
+        else {
+            data.families = [];
+        }
         return res.render("admin", { families: data.families });
     }
 
     // Family leader login
     let data = getData();
-    let family = data.families.find((family) => family.name == username);
-    if (family && family.password == password) {
-        let images;
-        try {
-            let imagesDir = path.join(__dirname, "scavenger_hunt", username);
-            images = await fsExtra.readdir(imagesDir);
-        } catch (error) {
-            console.error("Error reading files:", error);
-            return res.status(500).send("Server error");
+    if (data.families) {
+        let family = data.families.find((family) => family.name == username);
+        if (family && family.password == password) {
+            let images;
+            try {
+                let imagesDir = path.join(__dirname, "scavenger_hunt", username);
+                images = await fsExtra.readdir(imagesDir);
+            } catch (error) {
+                console.error("Error reading files:", error);
+                return res.status(500).send("Server error");
+            }
+            return res.render("family", { family: family, images: images });
         }
-        return res.render("family", { family: family, images: images });
     }
 
     // Invalid login
@@ -98,15 +135,18 @@ app.post("/login", async (req, res) => {
 app.post("/admin", (req, res) => {
     // Update points
     let data = getData();
-    data.families.forEach((family) => {
-        if (req.body[`points_${family.name}`]) {
-            family.points = parseInt(req.body[`points_${family.name}`]);
-        }
-    });
-    updateData(data);
-    // Render admin page
-    data.families.forEach(family => family.images = getFamilyImages(family.name));
-    return res.render("admin", { families: data.families });
+    if (data.families) {
+        data.families.forEach((family) => {
+            if (req.body[`points_${family.name}`]) {
+                family.points = parseInt(req.body[`points_${family.name}`]);
+            }
+        });
+        updateData(data);
+        // Render admin page
+        data.families.forEach(family => family.images = getFamilyImages(family.name));
+        return res.render("admin", { families: data.families });
+    }
+    return res.render("admin");
 });
 
 app.post("/family", upload.array("scavenger_hunt"), async (req, res) => {
@@ -150,11 +190,15 @@ app.delete("/delete-image", async (req, res) => {
 app.get("/api/leaderboard", (req, res) => {
     let points = {};
     let data = getData();
-    data.families.forEach((family) => {
-        points[family.name] = family.points;
-    });
-    points = Object.fromEntries(Object.entries(points).sort(([, a], [, b]) => b - a));
-    return res.json(points);
+    if (data.families) {
+        data.families.forEach((family) => {
+            points[family.name] = family.points;
+        });
+        // Sort by points descending
+        points = Object.fromEntries(Object.entries(points).sort(([, a], [, b]) => b - a));
+        return res.json(points);
+    }
+    return res.json({});
 });
 
 app.listen(PORT, () => {
