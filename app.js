@@ -4,12 +4,18 @@ const fsExtra = require("fs-extra");
 const fs = require("fs");
 const path = require("path");
 
-const getData = () => {
-    return JSON.parse(fs.readFileSync("data.json"));
-}
+const getData = () => JSON.parse(fs.readFileSync("data.json"));
 
-const updateData = (data) => {
-    fs.writeFileSync("data.json", JSON.stringify(data));
+const updateData = (data) => fs.writeFileSync("data.json", JSON.stringify(data));
+
+const getFamilyImages = (familyName) => {
+    const familyDir = path.join(__dirname, "scavenger_hunt", familyName);
+    try {
+        return fs.readdirSync(familyDir);
+    } catch (error) {
+        console.error(`Error reading directory for ${familyName}:`, error);
+        return [];
+    }
 }
 
 // Create scavenger hunt directories for each family
@@ -65,17 +71,9 @@ app.post("/login", async (req, res) => {
 
     // Admin login
     if (username == "admin" && password == ADMIN_PASSWORD) {
-        let families = getData().families;
-        for (let family of families) {
-            const familyDir = path.join(__dirname, "scavenger_hunt", family.name);
-            try {
-                family.images = fs.readdirSync(familyDir);
-            } catch (error) {
-                console.error(`Error reading directory for ${family.name}:`, error);
-                family.images = [];
-            }
-        }
-        return res.render("admin", { families: families });
+        let data = getData();
+        data.families.forEach(family => family.images = getFamilyImages(family.name));
+        return res.render("admin", { families: data.families });
     }
 
     // Family leader login
@@ -107,17 +105,8 @@ app.post("/admin", (req, res) => {
     });
     updateData(data);
     // Render admin page
-    let families = getData().families;
-    for (let family of families) {
-        const familyDir = path.join(__dirname, "scavenger_hunt", family.name);
-        try {
-            family.images = fs.readdirSync(familyDir);
-        } catch (error) {
-            console.error(`Error reading directory for ${family.name}:`, error);
-            family.images = [];
-        }
-    }
-    return res.render("admin", { families: families });
+    data.families.forEach(family => family.images = getFamilyImages(family.name));
+    return res.render("admin", { families: data.families });
 });
 
 app.post("/family", upload.array("scavenger_hunt"), async (req, res) => {
