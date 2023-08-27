@@ -25,8 +25,10 @@
                         <h4>Scavenger Hunt Pictures</h4>
                         {{#each images}}
                             <div class="image-container">
-                                <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image" class="scav-hunt-img">
-                                <button class="delete-image button is-danger is-small" data-family="{{../name}}" data-image="{{this}}">Delete</button>
+                                <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image"
+                                    class="scav-hunt-img">
+                                <button class="delete-image button is-danger is-small" data-family="{{../name}}"
+                                    data-image="{{this}}">Delete</button>
                             </div>
                         {{/each}}
                     </div>
@@ -86,7 +88,6 @@
             }
         }
     });
-
 </script>
 
 </html>
