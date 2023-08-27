@@ -47,7 +47,7 @@ table {
 }
 
 #scavenger-hunt-preview img, #uploaded-images div {
-    height: 10vw;
+    height: 25vh;
     object-fit: cover;
     margin: 0.5vw;
 }
@@ -70,4 +70,32 @@ table {
 
 .schedule-container {
     flex: 3;
+}
+
+.points-input {
+    width: 10vw !important;
+}
+
+@media only screen and (max-width: 600px) {
+    .holder {
+        flex-direction: column;
+    }
+
+    .family-container {
+        flex-direction: column;
+    }
+
+    .points-input {
+        width: 75vw !important;
+    }
+
+    #scavenger-hunt-preview, #uploaded-images {
+        width: 95vw;
+        flex-direction: column;
+    }
+
+    #scavenger-hunt-preview img, #uploaded-images div {
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
