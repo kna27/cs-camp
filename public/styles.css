@@ -1,7 +1,3 @@
-.password-reveal {
-    cursor: pointer;
-}
-
 section {
     text-align: center;
 }
@@ -15,6 +11,10 @@ section * {
 table {
     margin-left: auto;
     margin-right: auto;
+}
+
+.password-reveal {
+    cursor: pointer;
 }
 
 .family {
@@ -33,6 +33,25 @@ table {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+.holder {
+    display: flex;
+    margin: 1vw;
+}
+
+.leaderboard-container {
+    flex: 7;
+    max-height: 80vh;
+
+}
+
+.schedule-container {
+    flex: 3;
+}
+
+.points-input {
+    width: 10vw !important;
 }
 
 #scavenger-hunt-preview, #uploaded-images {
@@ -55,25 +74,6 @@ table {
 #uploaded-images div img {
     height: 80%;
     display: flex;
-}
-
-.holder {
-    display: flex;
-    margin: 1vw;
-}
-
-.leaderboard-container {
-    flex: 7;
-    max-height: 80vh;
-
-}
-
-.schedule-container {
-    flex: 3;
-}
-
-.points-input {
-    width: 10vw !important;
 }
 
 @media only screen and (max-width: 600px) {
