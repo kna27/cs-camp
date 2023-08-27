@@ -1,13 +1,8 @@
 const express = require("express");
 const multer = require("multer");
-const fsExtra = require('fs-extra');
-const Handlebars = require("hbs");
+const fsExtra = require("fs-extra");
 const fs = require("fs");
-const path = require('path');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
+const path = require("path");
 
 const getData = () => {
     return JSON.parse(fs.readFileSync("data.json"));
@@ -17,21 +12,19 @@ const updateData = (data) => {
     fs.writeFileSync("data.json", JSON.stringify(data));
 }
 
-
-const families = getData().families;
+// Create scavenger hunt directories for each family
+let families = getData().families;
 families.forEach(family => {
-    const directoryPath = path.join(__dirname, 'scavenger_hunt', family.name);
+    const directoryPath = path.join(__dirname, "scavenger_hunt", family.name);
     if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
     }
 });
 
-app.use(express.static(__dirname + "/public"));
-app.use('/scavenger_hunt', express.static(path.join(__dirname, 'scavenger_hunt')));
-
+// Multer storage setup
 const storage = multer.diskStorage({
     destination: async function (req, file, cb) {
-        const dest = path.join(__dirname, 'scavenger_hunt', req.query.family);
+        const dest = path.join(__dirname, "scavenger_hunt", req.query.family);
         try {
             await fsExtra.ensureDir(dest);
             cb(null, dest);
@@ -50,25 +43,31 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Express setup
+const app = express();
+const PORT = process.env.PORT || 3000;
+app.use(express.static(__dirname + "/public"));
+app.use("/scavenger_hunt", express.static(path.join(__dirname, "scavenger_hunt")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "hbs");
 
 
-ADMIN_PASSWORD = getData().admin_pw;
+const ADMIN_PASSWORD = getData().admin_pw;
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
     return res.render("index", getData());
 });
 
-app.post('/login', async (req, res) => {
+app.post("/login", async (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
 
+    // Admin login
     if (username == "admin" && password == ADMIN_PASSWORD) {
         let families = getData().families;
         for (let family of families) {
-            const familyDir = path.join(__dirname, 'scavenger_hunt', family.name);
+            const familyDir = path.join(__dirname, "scavenger_hunt", family.name);
             try {
                 family.images = fs.readdirSync(familyDir);
             } catch (error) {
@@ -79,23 +78,27 @@ app.post('/login', async (req, res) => {
         return res.render("admin", { families: families });
     }
 
+    // Family leader login
     let data = getData();
     let family = data.families.find((family) => family.name == username);
     if (family && family.password == password) {
         let images;
         try {
-            let imagesDir = path.join(__dirname, 'scavenger_hunt', username);
+            let imagesDir = path.join(__dirname, "scavenger_hunt", username);
             images = await fsExtra.readdir(imagesDir);
         } catch (error) {
-            console.error('Error reading files:', error);
-            return res.status(500).send('Server error');
+            console.error("Error reading files:", error);
+            return res.status(500).send("Server error");
         }
         return res.render("family", { family: family, images: images });
     }
+
+    // Invalid login
     return res.redirect("/");
 });
 
 app.post("/admin", (req, res) => {
+    // Update points
     let data = getData();
     data.families.forEach((family) => {
         if (req.body[`points_${family.name}`]) {
@@ -103,9 +106,10 @@ app.post("/admin", (req, res) => {
         }
     });
     updateData(data);
+    // Render admin page
     let families = getData().families;
     for (let family of families) {
-        const familyDir = path.join(__dirname, 'scavenger_hunt', family.name);
+        const familyDir = path.join(__dirname, "scavenger_hunt", family.name);
         try {
             family.images = fs.readdirSync(familyDir);
         } catch (error) {
@@ -116,15 +120,15 @@ app.post("/admin", (req, res) => {
     return res.render("admin", { families: families });
 });
 
-app.post("/family", upload.array('scavenger_hunt'), async (req, res) => {
+app.post("/family", upload.array("scavenger_hunt"), async (req, res) => {
     let familyName = req.query.family;
-    let imagesDir = path.join(__dirname, 'scavenger_hunt', familyName);
+    let imagesDir = path.join(__dirname, "scavenger_hunt", familyName);
     let images;
     try {
         images = await fsExtra.readdir(imagesDir);
     } catch (error) {
-        console.error('Error reading files:', error);
-        return res.status(500).send('Server error');
+        console.error("Error reading files:", error);
+        return res.status(500).send("Server error");
     }
     let data = getData();
     let family = data.families.find(f => f.name === familyName);
@@ -136,21 +140,21 @@ app.post("/family", upload.array('scavenger_hunt'), async (req, res) => {
     res.render("family", { family: family, images: images });
 });
 
-app.delete('/delete-image', async (req, res) => {
+app.delete("/delete-image", async (req, res) => {
     const familyName = req.query.family;
     const imageName = req.query.image;
     if (!familyName || !imageName) {
-        return res.status(400).send('Bad Request');
+        return res.status(400).send("Bad Request");
     }
 
-    const imagePath = path.join(__dirname, 'scavenger_hunt', familyName, imageName);
+    const imagePath = path.join(__dirname, "scavenger_hunt", familyName, imageName);
 
     try {
         await fsExtra.remove(imagePath);
-        res.status(200).send('Image deleted successfully');
+        res.status(200).send("Image deleted successfully");
     } catch (error) {
-        console.error('Error deleting the image:', error);
-        res.status(500).send('Server error');
+        console.error("Error deleting the image:", error);
+        res.status(500).send("Server error");
     }
 });
 
