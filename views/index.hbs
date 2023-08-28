@@ -53,6 +53,7 @@
             {{/each}}
         </div>
     {{/if}}
+    <div id="fullpage" onclick="this.style.display='none';"></div>
     <footer class="footer has-text-right">
         <h3>Staff Login</h3>
         <form action="/login" method="POST">
@@ -131,7 +132,16 @@
                 });
             });
     }
-
+    document.addEventListener('DOMContentLoaded', function () {
+        const imgs = document.querySelectorAll('img');
+        const fullPage = document.querySelector('#fullpage');
+        imgs.forEach(img => {
+            img.addEventListener('click', function () {
+                fullPage.style.backgroundImage = 'url(' + img.src + ')';
+                fullPage.style.display = 'block';
+            });
+        });
+    });
     updateLeaderboard();
     setInterval(updateLeaderboard, 5000);
     window.addEventListener('resize', updateLeaderboard);

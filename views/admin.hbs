@@ -58,6 +58,7 @@
     <button class="button is-warning toggle-hints">Toggle Hints</button>
     <br />
     <a href="/">Home</a>
+    <div id="fullpage" onclick="this.style.display='none';"></div>
 </body>
 <script>
     document.addEventListener('mouseover', function (e) {
@@ -142,6 +143,16 @@
     document.querySelector('.toggle-hints').addEventListener('click', function () {
         fetch('/api/toggle-hint-visibility', {
             method: 'POST'
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const imgs = document.querySelectorAll('img');
+        const fullPage = document.querySelector('#fullpage');
+        imgs.forEach(img => {
+            img.addEventListener('click', function () {
+                fullPage.style.backgroundImage = 'url(' + img.src + ')';
+                fullPage.style.display = 'block';
+            });
         });
     });
 </script>

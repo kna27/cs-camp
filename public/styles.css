@@ -76,6 +76,20 @@ table {
     display: flex;
 }
 
+#fullpage {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-size: contain;
+    background-repeat: no-repeat no-repeat;
+    background-position: center center;
+    background-color: black;
+}
+
 @media only screen and (max-width: 600px) {
     .holder {
         flex-direction: column;
