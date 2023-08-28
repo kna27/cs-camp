@@ -85,31 +85,6 @@
             }
         }
     });
-    document.addEventListener('click', async function (e) {
-        if (e.target.classList.contains('delete-image')) {
-            e.preventDefault();
-
-            const imageName = e.target.getAttribute('data-image');
-            const familyName = e.target.getAttribute('data-family');
-
-            try {
-                const response = await fetch(`/delete-image?family=${familyName}&image=${imageName}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    const imageContainer = e.target.closest('.image-container');
-                    if (imageContainer) {
-                        imageContainer.remove();
-                    }
-                } else {
-                    console.error('Failed to delete the image');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-    });
     document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function () {
         let preview = document.querySelector('#scavenger-hunt-preview');
         preview.innerHTML = '';
@@ -122,9 +97,8 @@
     document.addEventListener('click', async function (e) {
         if (e.target.classList.contains('delete-image')) {
             const imageName = e.target.getAttribute('data-image');
-            const familyName = '{{family.name}}';
             try {
-                const response = await fetch(`/delete-image?family=hints&image=${imageName}`, {
+                const response = await fetch(`/delete-image?family=__hints&image=${imageName}`, {
                     method: 'DELETE'
                 });
                 if (response.ok) {
