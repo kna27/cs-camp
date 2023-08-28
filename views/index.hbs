@@ -45,6 +45,14 @@
             </div>
         {{/if}}
     </div>
+    {{#if hintImages}}
+        <h1>Scavenger Hunt Hints</h1>
+        <div id="scavenger-hunt-hints" class="mb-3 mt-5">
+            {{#each hintImages}}
+                <img src="/scavenger_hunt/__hints/{{this}}" alt="Uploaded Image">
+            {{/each}}
+        </div>
+    {{/if}}
     <footer class="footer has-text-right">
         <h3>Staff Login</h3>
         <form action="/login" method="POST">

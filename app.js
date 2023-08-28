@@ -112,7 +112,14 @@ app.set("view engine", "hbs");
 const ADMIN_PASSWORD = getData().admin_pw;
 
 app.get("/", (req, res) => {
-    return res.render("index", getData());
+    let data = getData();
+    if (data.scav_hunt_hints_visible) {
+        data.hintImages = getFamilyImages("__hints");
+    }
+    else {
+        data.hintImages = [];
+    }
+    return res.render("index", data);
 });
 
 app.post("/login", async (req, res) => {
@@ -248,6 +255,18 @@ app.get("/api/leaderboard", (req, res) => {
     }
     return res.json({});
 });
+
+app.post("/api/toggle-hint-visibility", (req, res) => {
+    let data = getData();
+    if (data.scav_hunt_hints_visible) {
+        data.scav_hunt_hints_visible = false;
+    } else {
+        data.scav_hunt_hints_visible = true;
+    }
+    updateData(data);
+    return res.json({});
+});
+
 
 app.listen(PORT, () => {
     console.log(`Listening at http://localhost:${PORT}`);

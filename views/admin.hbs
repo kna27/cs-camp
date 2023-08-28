@@ -55,6 +55,8 @@
     {{else}}
         <h2 class="subtitle is-3">No Families Set</h2>
     {{/if}}
+    <button class="button is-warning toggle-hints">Toggle Hints</button>
+    <br />
     <a href="/">Home</a>
 </body>
 <script>
@@ -136,6 +138,11 @@
                 console.error('Error:', error);
             }
         }
+    });
+    document.querySelector('.toggle-hints').addEventListener('click', function () {
+        fetch('/api/toggle-hint-visibility', {
+            method: 'POST'
+        });
     });
 </script>
 

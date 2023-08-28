@@ -54,7 +54,7 @@ table {
     width: 10vw !important;
 }
 
-#scavenger-hunt-preview, #uploaded-images {
+#scavenger-hunt-preview, #uploaded-images, #scavenger-hunt-hints {
     width: 75vw;
     display: flex;
     flex-wrap: wrap;
@@ -65,7 +65,7 @@ table {
     margin-right: auto;
 }
 
-#scavenger-hunt-preview img, #uploaded-images div {
+#scavenger-hunt-preview img, #uploaded-images div, #scavenger-hunt-hints img {
     height: 25vh;
     object-fit: cover;
     margin: 0.5vw;
@@ -89,12 +89,12 @@ table {
         width: 75vw !important;
     }
 
-    #scavenger-hunt-preview, #uploaded-images {
+    #scavenger-hunt-preview, #uploaded-images, #scavenger-hunt-hints {
         width: 95vw;
         flex-direction: column;
     }
 
-    #scavenger-hunt-preview img, #uploaded-images div {
+    #scavenger-hunt-preview img, #uploaded-images div, #scavenger-hunt-hints img {
         margin-left: auto;
         margin-right: auto;
     }
