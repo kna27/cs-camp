@@ -167,22 +167,23 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/admin", async (req, res) => {
-    // Update points
     let data = getData();
     if (data.families) {
-        data.families.forEach(family => family.images = getFamilyImages(family.name));
+        data.families.forEach((family) => {
+            if (req.body[`points_${family.name}`]) {
+                family.points = parseInt(req.body[`points_${family.name}`]);
+            }
+        });
+        updateData(data);
+        // get hint images
+        try {
+            hintImages = await fsExtra.readdir(HINT_IMAGE_DIR);
+        } catch (error) {
+            console.error("Error reading files:", error);
+            return res.status(500).send("Server error");
+        }
+        return res.render("admin", { families: data.families, hintImages: hintImages });
     }
-    else {
-        data.families = [];
-    }
-    // get hint images
-    try {
-        hintImages = await fsExtra.readdir(HINT_IMAGE_DIR);
-    } catch (error) {
-        console.error("Error reading files:", error);
-        return res.status(500).send("Server error");
-    }
-    return res.render("admin", { families: data.families, hintImages: hintImages });
 });
 
 app.post("/family", upload.array("scavenger_hunt"), async (req, res) => {
