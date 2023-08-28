@@ -57,6 +57,11 @@ if (families) {
     });
 }
 
+const HINT_IMAGE_DIR = path.join(__dirname, "scavenger_hunt", "__hints");
+if (!fs.existsSync(HINT_IMAGE_DIR)) {
+    fs.mkdirSync(HINT_IMAGE_DIR, { recursive: true });
+}
+
 // Multer storage setup
 const storage = multer.diskStorage({
     destination: async function (req, file, cb) {
@@ -78,6 +83,21 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+const hintStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, HINT_IMAGE_DIR);
+    },
+    filename: function (req, file, cb) {
+        const timestamp = Date.now();
+        const extension = path.extname(file.originalname);
+        const baseName = path.basename(file.originalname, extension);
+        const newFilename = `${baseName}-${timestamp}${extension}`;
+        cb(null, newFilename);
+    }
+});
+
+const hintUpload = multer({ storage: hintStorage });
 
 // Express setup
 const app = express();
@@ -108,7 +128,14 @@ app.post("/login", async (req, res) => {
         else {
             data.families = [];
         }
-        return res.render("admin", { families: data.families });
+        // get hint images
+        try {
+            hintImages = await fsExtra.readdir(HINT_IMAGE_DIR);
+        } catch (error) {
+            console.error("Error reading files:", error);
+            return res.status(500).send("Server error");
+        }
+        return res.render("admin", { families: data.families, hintImages: hintImages });
     }
 
     // Family leader login
@@ -132,21 +159,23 @@ app.post("/login", async (req, res) => {
     return res.redirect("/");
 });
 
-app.post("/admin", (req, res) => {
+app.post("/admin", async (req, res) => {
     // Update points
     let data = getData();
     if (data.families) {
-        data.families.forEach((family) => {
-            if (req.body[`points_${family.name}`]) {
-                family.points = parseInt(req.body[`points_${family.name}`]);
-            }
-        });
-        updateData(data);
-        // Render admin page
         data.families.forEach(family => family.images = getFamilyImages(family.name));
-        return res.render("admin", { families: data.families });
     }
-    return res.render("admin");
+    else {
+        data.families = [];
+    }
+    // get hint images
+    try {
+        hintImages = await fsExtra.readdir(HINT_IMAGE_DIR);
+    } catch (error) {
+        console.error("Error reading files:", error);
+        return res.status(500).send("Server error");
+    }
+    return res.render("admin", { families: data.families, hintImages: hintImages });
 });
 
 app.post("/family", upload.array("scavenger_hunt"), async (req, res) => {
@@ -168,6 +197,25 @@ app.post("/family", upload.array("scavenger_hunt"), async (req, res) => {
 
     res.render("family", { family: family, images: images });
 });
+
+app.post("/admin/upload", hintUpload.array("scavenger_hunt"), async (req, res) => {
+    let data = getData();
+    if (data.families) {
+        data.families.forEach(family => family.images = getFamilyImages(family.name));
+    }
+    else {
+        data.families = [];
+    }
+    // get hint images
+    try {
+        hintImages = await fsExtra.readdir(HINT_IMAGE_DIR);
+    } catch (error) {
+        console.error("Error reading files:", error);
+        return res.status(500).send("Server error");
+    }
+    return res.render("admin", { families: data.families, hintImages: hintImages });
+});
+
 
 app.delete("/delete-image", async (req, res) => {
     const familyName = req.query.family;
