@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="js/utils.js"></script>
     <title>Admin | BCA CS Camp</title>
 </head>
 
@@ -58,8 +59,10 @@
     <button class="button is-warning toggle-hints">Toggle Hints</button>
     <br />
     <a href="/">Home</a>
-    <div id="fullpage" onclick="this.style.display='none';"></div>
 </body>
+<script>
+    fullscreenImages();
+</script>
 <script>
     document.addEventListener('mouseover', function (e) {
         if (e.target.classList.contains('password-reveal')) {
@@ -85,15 +88,7 @@
             }
         }
     });
-    document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function () {
-        let preview = document.querySelector('#scavenger-hunt-preview');
-        preview.innerHTML = '';
-        for (const file of this.files) {
-            let img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            preview.appendChild(img);
-        }
-    });
+
     document.addEventListener('click', async function (e) {
         if (e.target.classList.contains('delete-image')) {
             const imageName = e.target.getAttribute('data-image');
@@ -117,16 +112,6 @@
     document.querySelector('.toggle-hints').addEventListener('click', function () {
         fetch('/api/toggle-hint-visibility', {
             method: 'POST'
-        });
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        const imgs = document.querySelectorAll('img');
-        const fullPage = document.querySelector('#fullpage');
-        imgs.forEach(img => {
-            img.addEventListener('click', function () {
-                fullPage.style.backgroundImage = 'url(' + img.src + ')';
-                fullPage.style.display = 'block';
-            });
         });
     });
 </script>
