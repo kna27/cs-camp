@@ -26,10 +26,10 @@
                         <div class="family-images mt-5">
                             <h4>Scavenger Hunt Pictures</h4>
                             {{#each images}}
-                                <div class="image-container">
+                                <div class="image-container" id="container-family-scav-hunt">
                                     <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image"
                                         class="scav-hunt-img">
-                                    <button class="delete-image button is-danger is-small" data-family="{{../name}}"
+                                    <button class="delete-image button is-danger is-small delete-img-family-scav-hunt" data-family="{{../name}}"
                                         data-image="{{this}}">Delete</button>
                                 </div>
                             {{/each}}
@@ -47,9 +47,9 @@
         <h3 class="mt-3">Previously Uploaded Images</h3>
         <div id="uploaded-images" class="mb-5">
             {{#each hintImages}}
-                <div class="image-container">
+                <div class="image-container" id="container-prev-uploaded-hints">
                     <img src="/scavenger_hunt/__hints/{{this}}" alt="Uploaded Image">
-                    <button class="delete-image button is-danger is-small" data-image="{{this}}">Delete</button>
+                    <button class="delete-image button is-danger is-small delete-img-prev-uploaded-hint" data-image="{{this}}">Delete</button>
                 </div>
             {{/each}}
         </div>
@@ -62,6 +62,9 @@
 </body>
 <script>
     fullscreenImages();
+    previewUploads("scavenger_hunt", "scavenger-hunt-preview");
+    deleteImage("delete-img-prev-uploaded-hint", "container-prev-uploaded-hints", "__hints");
+    deleteImage("delete-img-family-scav-hunt", "container-family-scav-hunt", null);
 </script>
 <script>
     document.addEventListener('mouseover', function (e) {
@@ -87,32 +90,6 @@
                 e.target.setAttribute('data-clicked', true);
             }
         }
-    });
-
-    document.addEventListener('click', async function (e) {
-        if (e.target.classList.contains('delete-image')) {
-            const imageName = e.target.getAttribute('data-image');
-            try {
-                const response = await fetch(`/delete-image?family=__hints&image=${imageName}`, {
-                    method: 'DELETE'
-                });
-                if (response.ok) {
-                    const imageContainer = e.target.closest('.image-container');
-                    if (imageContainer) {
-                        imageContainer.remove();
-                    }
-                } else {
-                    console.error('Failed to delete the image');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-    });
-    document.querySelector('.toggle-hints').addEventListener('click', function () {
-        fetch('/api/toggle-hint-visibility', {
-            method: 'POST'
-        });
     });
 </script>
 

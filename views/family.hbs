@@ -23,9 +23,9 @@
     <h3 class="mt-3">Previously Uploaded Images</h3>
     <div id="uploaded-images" class="mb-5">
         {{#each images}}
-            <div class="image-container">
+            <div class="image-container" id="container-prev-uploaded-scav-hunt">
                 <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
-                <button class="delete-image button is-danger is-small" data-image="{{this}}">Delete</button>
+                <button class="delete-image button is-danger is-small delete-img-prev-uploaded-scav-hunt" data-image="{{this}}">Delete</button>
             </div>
         {{/each}}
     </div>
@@ -33,38 +33,8 @@
 </body>
 <script>
     fullscreenImages();
-</script>
-<script>
-    document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function () {
-        let preview = document.querySelector('#scavenger-hunt-preview');
-        preview.innerHTML = '';
-        for (const file of this.files) {
-            let img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            preview.appendChild(img);
-        }
-    });
-    document.addEventListener('click', async function (e) {
-        if (e.target.classList.contains('delete-image')) {
-            const imageName = e.target.getAttribute('data-image');
-            const familyName = '{{family.name}}';
-            try {
-                const response = await fetch(`/delete-image?family=${familyName}&image=${imageName}`, {
-                    method: 'DELETE'
-                });
-                if (response.ok) {
-                    const imageContainer = e.target.closest('.image-container');
-                    if (imageContainer) {
-                        imageContainer.remove();
-                    }
-                } else {
-                    console.error('Failed to delete the image');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-    });
+    previewUploads("scavenger_hunt", "scavenger-hunt-preview");
+    deleteImage("delete-img-prev-uploaded-scav-hunt", "container-prev-uploaded-scav-hunt", "{{family.name}}");
 </script>
 
 </html>
