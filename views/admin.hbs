@@ -25,6 +25,7 @@
 
                         <div class="family-images mt-5">
                             <h4>Scavenger Hunt Pictures</h4>
+                            <p>{{images.length}} {{#if (eq images.length 1)}}Image{{else}}Images{{/if}}</p>
                             {{#each images}}
                                 <div class="image-container" id="container-family-scav-hunt">
                                     <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image"
@@ -45,6 +46,7 @@
             <button type="submit" class="button is-primary">Upload</button>
         </form>
         <h3 class="mt-3">Previously Uploaded Images</h3>
+        <p>{{hintImages.length}} {{#if (eq hintImages.length 1)}}Image{{else}}Images{{/if}}</p>
         <div id="uploaded-images" class="mb-5">
             {{#each hintImages}}
                 <div class="image-container" id="container-prev-uploaded-hints">

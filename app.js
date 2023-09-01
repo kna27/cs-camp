@@ -1,5 +1,6 @@
 const express = require("express");
 const multer = require("multer");
+const Handlebars = require("hbs");
 const fsExtra = require("fs-extra");
 const fs = require("fs");
 const path = require("path");
@@ -45,6 +46,10 @@ const getFamilyImages = (familyName) => {
         return [];
     }
 }
+
+Handlebars.registerHelper('eq', function (arg1, arg2) {
+    return (arg1 == arg2);
+});
 
 // Create scavenger hunt directories for each family
 let families = getData().families;
