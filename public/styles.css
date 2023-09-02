@@ -54,6 +54,12 @@ table {
     width: 10vw !important;
 }
 
+.notification {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.5vw;
+}
+
 #scavenger-hunt-preview, #uploaded-images, #scavenger-hunt-hints {
     width: 75vw;
     display: flex;

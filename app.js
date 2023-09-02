@@ -124,6 +124,11 @@ app.get("/", (req, res) => {
     else {
         data.hintImages = [];
     }
+    if (req.query.error) {
+        if (req.query.error == "invalid_login") {
+            data.error = "Invalid username or password";
+        }
+    }
     return res.render("index", data);
 });
 
@@ -168,7 +173,7 @@ app.post("/login", async (req, res) => {
     }
 
     // Invalid login
-    return res.redirect("/");
+    return res.redirect("/?error=invalid_login");
 });
 
 app.post("/admin", async (req, res) => {
