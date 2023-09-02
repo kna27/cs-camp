@@ -30,8 +30,8 @@
                                 <div class="image-container" id="container-family-scav-hunt">
                                     <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image"
                                         class="scav-hunt-img">
-                                    <button class="delete-image button is-danger is-small delete-img-family-scav-hunt" data-family="{{../name}}"
-                                        data-image="{{this}}">Delete</button>
+                                    <button class="delete-image button is-danger is-small delete-img-family-scav-hunt"
+                                        data-family="{{../name}}" data-image="{{this}}">Delete</button>
                                 </div>
                             {{/each}}
                         </div>
@@ -51,7 +51,8 @@
             {{#each hintImages}}
                 <div class="image-container" id="container-prev-uploaded-hints">
                     <img src="/scavenger_hunt/__hints/{{this}}" alt="Uploaded Image">
-                    <button class="delete-image button is-danger is-small delete-img-prev-uploaded-hint" data-image="{{this}}">Delete</button>
+                    <button class="delete-image button is-danger is-small delete-img-prev-uploaded-hint"
+                        data-image="{{this}}">Delete</button>
                 </div>
             {{/each}}
         </div>
@@ -95,6 +96,31 @@
             }
         }
     });
+
+    const hintsBtn = document.querySelector('.toggle-hints');
+    const updateHintsBtn = () => {
+        fetch('/api/hint-visibility')
+            .then(response => response.json())
+            .then(data => {
+                if (data.hint_visibility) {
+                    hintsBtn.textContent = 'Hide Hints';
+                    hintsBtn.classList.remove('is-warning');
+                    hintsBtn.classList.add('is-danger');
+                } else {
+                    hintsBtn.textContent = 'Show Hints';
+                    hintsBtn.classList.remove('is-danger');
+                    hintsBtn.classList.add('is-warning');
+                }
+            });
+    };
+
+    document.querySelector('.toggle-hints').addEventListener('click', function () {
+        fetch('/api/toggle-hint-visibility', {
+            method: 'POST'
+        });
+        updateHintsBtn();
+    });
+    updateHintsBtn();
 </script>
 
 </html>

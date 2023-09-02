@@ -290,9 +290,13 @@ app.post("/api/toggle-hint-visibility", (req, res) => {
         data.scav_hunt_hints_visible = true;
     }
     updateData(data);
-    return res.json({});
+    return res.json({ "hint_visibility": data.scav_hunt_hints_visible });
 });
 
+app.get("/api/hint-visibility", (req, res) => {
+    let data = getData();
+    return res.json({ "hint_visibility": data.scav_hunt_hints_visible });
+});
 
 app.listen(PORT, () => {
     console.log(`Listening at http://localhost:${PORT}`);
