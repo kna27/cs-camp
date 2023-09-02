@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const Handlebars = require("hbs");
 const fsExtra = require("fs-extra");
+const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
 
@@ -251,6 +252,20 @@ app.delete("/delete-image", async (req, res) => {
         console.error("Error deleting the image:", error);
         res.status(500).send("Server error");
     }
+});
+
+app.get("/download", (req, res) => {
+    const archive = archiver("zip", {
+        zlib: { level: 9 }
+    });
+    archive.on("error", (err) => {
+        console.error("Error creating archive:", err);
+        res.status(500).send("Server error");
+    });
+    res.attachment("scavenger_hunt.zip");
+    archive.pipe(res);
+    archive.directory(path.join(__dirname, "scavenger_hunt"), false);
+    archive.finalize();
 });
 
 app.get("/api/leaderboard", (req, res) => {
