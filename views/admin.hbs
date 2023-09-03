@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <script src="js/utils.js"></script>
+    <script src="/js/utils.js"></script>
     <title>Admin | BCA CS Camp</title>
 </head>
 
@@ -24,9 +24,8 @@
                         <p>Password: <span class="password-reveal" data-password="{{password}}">••••••••</span></p>
                         <input type="number" class="input points-input" name="points_{{name}}" value="{{points}}">
 
-                        <div class="family-images mt-5">
+                        <div class="family-images mt-5 img-count">
                             <h4>Scavenger Hunt Pictures</h4>
-                            <p>{{images.length}} {{#if (eq images.length 1)}}Image{{else}}Images{{/if}}</p>
                             {{#each images}}
                                 <div class="image-container" id="container-family-scav-hunt">
                                     <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image"
@@ -48,8 +47,7 @@
             <button type="submit" class="button is-primary">Upload</button>
         </form>
         <h3 class="mt-3">Previously Uploaded Images</h3>
-        <p>{{hintImages.length}} {{#if (eq hintImages.length 1)}}Image{{else}}Images{{/if}}</p>
-        <div id="uploaded-images" class="mb-5">
+        <div id="uploaded-images" class="mb-5 img-count">
             {{#each hintImages}}
                 <div class="image-container" id="container-prev-uploaded-hints">
                     <img src="/scavenger_hunt/__hints/{{this}}" alt="Uploaded Image">
@@ -73,6 +71,7 @@
     deleteImage("delete-img-prev-uploaded-hint", "container-prev-uploaded-hints", "__hints");
     deleteImage("delete-img-family-scav-hunt", "container-family-scav-hunt", null);
     compressImages("fileInput");
+    imageCount("img-count");
 </script>
 <script>
     document.addEventListener('mouseover', function (e) {

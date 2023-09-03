@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <script src="js/utils.js"></script>
+    <script src="/js/utils.js"></script>
     <title>Family Leader | BCA CS Camp</title>
 </head>
 
@@ -22,8 +22,7 @@
         <button type="submit" class="button is-primary">Upload</button>
     </form>
     <h3 class="mt-3">Previously Uploaded Images</h3>
-    <p>{{images.length}} {{#if (eq images.length 1)}}Image{{else}}Images{{/if}}</p>
-    <div id="uploaded-images" class="mb-5">
+    <div id="uploaded-images" class="mb-5 img-count">
         {{#each images}}
             <div class="image-container" id="container-prev-uploaded-scav-hunt">
                 <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
@@ -39,6 +38,7 @@
     previewUploads("scavenger_hunt", "scavenger-hunt-preview");
     deleteImage("delete-img-prev-uploaded-scav-hunt", "container-prev-uploaded-scav-hunt", "{{family.name}}");
     compressImages("fileInput");
+    imageCount("img-count");
 </script>
 
 </html>

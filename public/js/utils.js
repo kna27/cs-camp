@@ -59,6 +59,28 @@ const deleteImage = (deleteBtnClass, imgContainerId, family) => {
     });
 }
 
+const imageCount = (imgCountClass) => {
+    const imgContainers = document.querySelectorAll(`.${imgCountClass}`);
+    imgContainers.forEach(imgContainer => {
+        const countElement = document.createElement('p');
+        const updateCount = () => {
+            const count = imgContainer.querySelectorAll('div').length;
+            console.log(count)
+            countElement.innerHTML = `${count} Picture${count === 1 ? '' : 's'}`;
+        }
+        imgContainer.parentNode.insertBefore(countElement, imgContainer);
+        updateCount();
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList') {
+                    updateCount();
+                }
+            });
+        });
+        observer.observe(imgContainer, { childList: true });
+    });
+}
+
 const compressImages = (fileInputId) => {
     const maxDimension = 1500;
     const quality = 0.8;
