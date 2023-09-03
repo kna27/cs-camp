@@ -8,10 +8,17 @@
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/utils.js"></script>
     <title>BCA CS Camp</title>
 </head>
 
 <body class="content has-text-centered">
+    {{#if error}}
+        <div class="notification is-danger" style="width: 80%">
+            <button class="delete" onclick="this.parentElement.style.display='none';"></button>
+            <p>Error: {{error}}</p>
+        </div>
+    {{/if}}
     <h1 class="title is-2">BCA CS Camp</h1>
     <h2 class="subtitle is-3">Web Dev Links:</h2>
     <a href=https://replit.com/@vrielle/Web-Dev-Template-CS-Camp?v=1>https://replit.com/@vrielle/Web-Dev-Template-CS-Camp?v=1</a>
@@ -52,13 +59,14 @@
     </div>
     {{#if hintImages}}
         <h1>Scavenger Hunt Hints</h1>
-        <div id="scavenger-hunt-hints" class="mb-3 mt-5">
+        <div id="scavenger-hunt-hints" class="mb-3 mt-5 img-count">
             {{#each hintImages}}
-                <img src="/scavenger_hunt/__hints/{{this}}" alt="Uploaded Image">
+                <div>
+                    <img src="/scavenger_hunt/__hints/{{this}}" alt="Uploaded Image">
+                </div>
             {{/each}}
         </div>
     {{/if}}
-    <div id="fullpage" onclick="this.style.display='none';"></div>
     <footer class="footer has-text-right">
         <h3>Staff Login</h3>
         <form action="/login" method="POST">
@@ -68,6 +76,10 @@
         </form>
     </footer>
 </body>
+<script>
+    fullscreenImages();
+    imageCount("img-count");
+</script>
 <script>
     let leaderboardChart;
     let lbData;
@@ -127,9 +139,6 @@
                         },
                         plugins: {
                             legend: false,
-                        },
-                        animation: {
-                            duration: 0
                         }
                     },
                     responsive: true,
@@ -137,16 +146,6 @@
                 });
             });
     }
-    document.addEventListener('DOMContentLoaded', function () {
-        const imgs = document.querySelectorAll('img');
-        const fullPage = document.querySelector('#fullpage');
-        imgs.forEach(img => {
-            img.addEventListener('click', function () {
-                fullPage.style.backgroundImage = 'url(' + img.src + ')';
-                fullPage.style.display = 'block';
-            });
-        });
-    });
     updateLeaderboard();
     setInterval(updateLeaderboard, 5000);
     window.addEventListener('resize', updateLeaderboard);

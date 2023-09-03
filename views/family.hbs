@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="/js/utils.js"></script>
     <title>Family Leader | BCA CS Camp</title>
 </head>
 
@@ -15,63 +16,30 @@
     <h2 class="subtitle is-3">{{family.name}} | {{family.points}} Points</h2>
     <form action="/family?family={{family.name}}" method="POST" enctype="multipart/form-data">
         <h3>Upload Scavenger Hunt Pictures</h3>
-        <input type="file" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw" multiple>
+        <input type="file" id="fileInput" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw"
+            multiple>
         <div id="scavenger-hunt-preview" class="mt-5 mb-3"></div>
-        <button type="submit" class="button is-primary">Upload</button>
+        <button type="submit" class="button is-primary" id="upload-img-btn">Upload</button>
     </form>
     <h3 class="mt-3">Previously Uploaded Images</h3>
-    <div id="uploaded-images" class="mb-5">
+    <div id="uploaded-images" class="mb-5 img-count">
         {{#each images}}
-            <div class="image-container">
+            <div class="image-container" id="container-prev-uploaded-scav-hunt">
                 <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
-                <button class="delete-image button is-danger is-small" data-image="{{this}}">Delete</button>
+                <button class="delete-image button is-danger is-small delete-img-prev-uploaded-scav-hunt"
+                    data-image="{{this}}">Delete</button>
             </div>
         {{/each}}
     </div>
-    <div id="fullpage" onclick="this.style.display='none';"></div>
     <a href="/">Home</a>
 </body>
 <script>
-    document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function () {
-        let preview = document.querySelector('#scavenger-hunt-preview');
-        preview.innerHTML = '';
-        for (const file of this.files) {
-            let img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            preview.appendChild(img);
-        }
-    });
-    document.addEventListener('click', async function (e) {
-        if (e.target.classList.contains('delete-image')) {
-            const imageName = e.target.getAttribute('data-image');
-            const familyName = '{{family.name}}';
-            try {
-                const response = await fetch(`/delete-image?family=${familyName}&image=${imageName}`, {
-                    method: 'DELETE'
-                });
-                if (response.ok) {
-                    const imageContainer = e.target.closest('.image-container');
-                    if (imageContainer) {
-                        imageContainer.remove();
-                    }
-                } else {
-                    console.error('Failed to delete the image');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        const imgs = document.querySelectorAll('img');
-        const fullPage = document.querySelector('#fullpage');
-        imgs.forEach(img => {
-            img.addEventListener('click', function () {
-                fullPage.style.backgroundImage = 'url(' + img.src + ')';
-                fullPage.style.display = 'block';
-            });
-        });
-    });
+    fullscreenImages();
+    previewUploads("scavenger_hunt", "scavenger-hunt-preview");
+    deleteImage("delete-img-prev-uploaded-scav-hunt", "container-prev-uploaded-scav-hunt", "{{family.name}}");
+    compressImages("fileInput");
+    imageCount("img-count");
+    uploadNotification("upload-img-btn");
 </script>
 
 </html>

@@ -7,12 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="/js/utils.js"></script>
     <title>Admin | BCA CS Camp</title>
 </head>
 
 <body class="content has-text-centered">
     <h1 class="title is-2">Admin Panel</h1>
     {{#if families}}
+        <h2 class="subtitle is-3 mt-5">Manage Families</h2>
         <form action="/admin" method="POST">
             <button type="submit" class="button is-primary">Update Points</button>
             <div class="family-container">
@@ -22,14 +24,14 @@
                         <p>Password: <span class="password-reveal" data-password="{{password}}">••••••••</span></p>
                         <input type="number" class="input points-input" name="points_{{name}}" value="{{points}}">
 
-                        <div class="family-images mt-5">
+                        <div class="family-images mt-5 img-count">
                             <h4>Scavenger Hunt Pictures</h4>
                             {{#each images}}
-                                <div class="image-container">
+                                <div class="image-container" id="container-family-scav-hunt">
                                     <img src="/scavenger_hunt/{{../name}}/{{this}}" alt="Uploaded Image"
                                         class="scav-hunt-img">
-                                    <button class="delete-image button is-danger is-small" data-family="{{../name}}"
-                                        data-image="{{this}}">Delete</button>
+                                    <button class="delete-image button is-danger is-small delete-img-family-scav-hunt"
+                                        data-family="{{../name}}" data-image="{{this}}">Delete</button>
                                 </div>
                             {{/each}}
                         </div>
@@ -39,27 +41,39 @@
         </form>
         <h2 class="subtitle is-3">Upload Scavenger Hunt Hints</h2>
         <form action="/admin/upload" method="POST" enctype="multipart/form-data">
-            <input type="file" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw" multiple>
+            <input type="file" id="fileInput" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw"
+                multiple>
             <div id="scavenger-hunt-preview" class="mt-5 mb-3"></div>
-            <button type="submit" class="button is-primary">Upload</button>
+            <button type="submit" class="button is-primary" id="upload-img-btn">Upload</button>
         </form>
         <h3 class="mt-3">Previously Uploaded Images</h3>
-        <div id="uploaded-images" class="mb-5">
+        <div id="uploaded-images" class="mb-5 img-count">
             {{#each hintImages}}
-                <div class="image-container">
+                <div class="image-container" id="container-prev-uploaded-hints">
                     <img src="/scavenger_hunt/__hints/{{this}}" alt="Uploaded Image">
-                    <button class="delete-image button is-danger is-small" data-image="{{this}}">Delete</button>
+                    <button class="delete-image button is-danger is-small delete-img-prev-uploaded-hint"
+                        data-image="{{this}}">Delete</button>
                 </div>
             {{/each}}
         </div>
     {{else}}
         <h2 class="subtitle is-3">No Families Set</h2>
     {{/if}}
+    <a href="/download"><button class="button is-info mb-3">Download All Images</button></a>
+    <br />
     <button class="button is-warning toggle-hints">Toggle Hints</button>
     <br />
     <a href="/">Home</a>
-    <div id="fullpage" onclick="this.style.display='none';"></div>
 </body>
+<script>
+    fullscreenImages();
+    previewUploads("scavenger_hunt", "scavenger-hunt-preview");
+    deleteImage("delete-img-prev-uploaded-hint", "container-prev-uploaded-hints", "__hints");
+    deleteImage("delete-img-family-scav-hunt", "container-family-scav-hunt", null);
+    compressImages("fileInput");
+    imageCount("img-count");
+    uploadNotification("upload-img-btn");
+</script>
 <script>
     document.addEventListener('mouseover', function (e) {
         if (e.target.classList.contains('password-reveal')) {
@@ -85,50 +99,31 @@
             }
         }
     });
-    document.querySelector('input[name="scavenger_hunt"]').addEventListener('change', function () {
-        let preview = document.querySelector('#scavenger-hunt-preview');
-        preview.innerHTML = '';
-        for (const file of this.files) {
-            let img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            preview.appendChild(img);
-        }
-    });
-    document.addEventListener('click', async function (e) {
-        if (e.target.classList.contains('delete-image')) {
-            const imageName = e.target.getAttribute('data-image');
-            try {
-                const response = await fetch(`/delete-image?family=__hints&image=${imageName}`, {
-                    method: 'DELETE'
-                });
-                if (response.ok) {
-                    const imageContainer = e.target.closest('.image-container');
-                    if (imageContainer) {
-                        imageContainer.remove();
-                    }
+
+    const hintsBtn = document.querySelector('.toggle-hints');
+    const updateHintsBtn = () => {
+        fetch('/api/hint-visibility')
+            .then(response => response.json())
+            .then(data => {
+                if (data.hint_visibility) {
+                    hintsBtn.textContent = 'Hide Hints';
+                    hintsBtn.classList.remove('is-warning');
+                    hintsBtn.classList.add('is-danger');
                 } else {
-                    console.error('Failed to delete the image');
+                    hintsBtn.textContent = 'Show Hints';
+                    hintsBtn.classList.remove('is-danger');
+                    hintsBtn.classList.add('is-warning');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-    });
+            });
+    };
+
     document.querySelector('.toggle-hints').addEventListener('click', function () {
         fetch('/api/toggle-hint-visibility', {
             method: 'POST'
         });
+        updateHintsBtn();
     });
-    document.addEventListener('DOMContentLoaded', function () {
-        const imgs = document.querySelectorAll('img');
-        const fullPage = document.querySelector('#fullpage');
-        imgs.forEach(img => {
-            img.addEventListener('click', function () {
-                fullPage.style.backgroundImage = 'url(' + img.src + ')';
-                fullPage.style.display = 'block';
-            });
-        });
-    });
+    updateHintsBtn();
 </script>
 
 </html>

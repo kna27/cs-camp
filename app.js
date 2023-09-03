@@ -1,6 +1,8 @@
 const express = require("express");
 const multer = require("multer");
+const Handlebars = require("hbs");
 const fsExtra = require("fs-extra");
+const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
 
@@ -45,6 +47,10 @@ const getFamilyImages = (familyName) => {
         return [];
     }
 }
+
+Handlebars.registerHelper('eq', function (arg1, arg2) {
+    return (arg1 == arg2);
+});
 
 // Create scavenger hunt directories for each family
 let families = getData().families;
@@ -119,6 +125,11 @@ app.get("/", (req, res) => {
     else {
         data.hintImages = [];
     }
+    if (req.query.error) {
+        if (req.query.error == "invalid_login") {
+            data.error = "Invalid username or password";
+        }
+    }
     return res.render("index", data);
 });
 
@@ -163,7 +174,7 @@ app.post("/login", async (req, res) => {
     }
 
     // Invalid login
-    return res.redirect("/");
+    return res.redirect("/?error=invalid_login");
 });
 
 app.post("/admin", async (req, res) => {
@@ -243,6 +254,20 @@ app.delete("/delete-image", async (req, res) => {
     }
 });
 
+app.get("/download", (req, res) => {
+    const archive = archiver("zip", {
+        zlib: { level: 9 }
+    });
+    archive.on("error", (err) => {
+        console.error("Error creating archive:", err);
+        res.status(500).send("Server error");
+    });
+    res.attachment("scavenger_hunt.zip");
+    archive.pipe(res);
+    archive.directory(path.join(__dirname, "scavenger_hunt"), false);
+    archive.finalize();
+});
+
 app.get("/api/leaderboard", (req, res) => {
     let points = {};
     let data = getData();
@@ -265,9 +290,13 @@ app.post("/api/toggle-hint-visibility", (req, res) => {
         data.scav_hunt_hints_visible = true;
     }
     updateData(data);
-    return res.json({});
+    return res.json({ "hint_visibility": data.scav_hunt_hints_visible });
 });
 
+app.get("/api/hint-visibility", (req, res) => {
+    let data = getData();
+    return res.json({ "hint_visibility": data.scav_hunt_hints_visible });
+});
 
 app.listen(PORT, () => {
     console.log(`Listening at http://localhost:${PORT}`);
