@@ -14,6 +14,7 @@
 <body class="content has-text-centered">
     <h1 class="title is-2">Admin Panel</h1>
     {{#if families}}
+        <h2 class="subtitle is-3 mt-5">Manage Families</h2>
         <form action="/admin" method="POST">
             <button type="submit" class="button is-primary">Update Points</button>
             <div class="family-container">
@@ -41,7 +42,8 @@
         </form>
         <h2 class="subtitle is-3">Upload Scavenger Hunt Hints</h2>
         <form action="/admin/upload" method="POST" enctype="multipart/form-data">
-            <input type="file" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw" multiple>
+            <input type="file" id="fileInput" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw"
+                multiple>
             <div id="scavenger-hunt-preview" class="mt-5 mb-3"></div>
             <button type="submit" class="button is-primary">Upload</button>
         </form>
@@ -70,6 +72,7 @@
     previewUploads("scavenger_hunt", "scavenger-hunt-preview");
     deleteImage("delete-img-prev-uploaded-hint", "container-prev-uploaded-hints", "__hints");
     deleteImage("delete-img-family-scav-hunt", "container-family-scav-hunt", null);
+    compressImages("fileInput");
 </script>
 <script>
     document.addEventListener('mouseover', function (e) {

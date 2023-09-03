@@ -16,7 +16,8 @@
     <h2 class="subtitle is-3">{{family.name}} | {{family.points}} Points</h2>
     <form action="/family?family={{family.name}}" method="POST" enctype="multipart/form-data">
         <h3>Upload Scavenger Hunt Pictures</h3>
-        <input type="file" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw" multiple>
+        <input type="file" id="fileInput" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw"
+            multiple>
         <div id="scavenger-hunt-preview" class="mt-5 mb-3"></div>
         <button type="submit" class="button is-primary">Upload</button>
     </form>
@@ -26,7 +27,8 @@
         {{#each images}}
             <div class="image-container" id="container-prev-uploaded-scav-hunt">
                 <img src="/scavenger_hunt/{{../family.name}}/{{this}}" alt="Uploaded Image">
-                <button class="delete-image button is-danger is-small delete-img-prev-uploaded-scav-hunt" data-image="{{this}}">Delete</button>
+                <button class="delete-image button is-danger is-small delete-img-prev-uploaded-scav-hunt"
+                    data-image="{{this}}">Delete</button>
             </div>
         {{/each}}
     </div>
@@ -36,6 +38,7 @@
     fullscreenImages();
     previewUploads("scavenger_hunt", "scavenger-hunt-preview");
     deleteImage("delete-img-prev-uploaded-scav-hunt", "container-prev-uploaded-scav-hunt", "{{family.name}}");
+    compressImages("fileInput");
 </script>
 
 </html>

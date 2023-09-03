@@ -58,3 +58,70 @@ const deleteImage = (deleteBtnClass, imgContainerId, family) => {
         }
     });
 }
+
+const compressImages = (fileInputId) => {
+    const maxDimension = 1500;
+    const quality = 0.8;
+
+    const dataURLToBlob = (dataURL) => {
+        const byteString = atob(dataURL.split(',')[1]);
+        const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    }
+
+    const fileInput = document.getElementById(fileInputId);
+
+    fileInput.addEventListener("change", function () {
+        const files = fileInput.files;
+        const compressedFiles = [];
+
+        Array.from(files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function () {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    let width = img.width;
+                    let height = img.height;
+                    const aspectRatio = width / height;
+                    if (width > height) {
+                        if (width > maxDimension) {
+                            width = maxDimension;
+                            height = width / aspectRatio;
+                        }
+                    } else {
+                        if (height > maxDimension) {
+                            height = maxDimension;
+                            width = height * aspectRatio;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataURL = canvas.toDataURL("image/jpeg", quality);
+                    const blob = dataURLToBlob(dataURL);
+                    compressedFiles.push(new File([blob], file.name, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    }));
+                    if (compressedFiles.length === files.length) {
+                        fileInput.value = "";
+                        let list = new DataTransfer();
+                        for (let i = 0; i < compressedFiles.length; i++) {
+                            list.items.add(compressedFiles[i]);
+                        }
+                        fileInput.files = list.files;
+                    }
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+}
