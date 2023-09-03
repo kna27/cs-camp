@@ -65,7 +65,6 @@ const imageCount = (imgCountClass) => {
         const countElement = document.createElement('p');
         const updateCount = () => {
             const count = imgContainer.querySelectorAll('div').length;
-            console.log(count)
             countElement.innerHTML = `${count} Picture${count === 1 ? '' : 's'}`;
         }
         imgContainer.parentNode.insertBefore(countElement, imgContainer);
@@ -78,6 +77,23 @@ const imageCount = (imgCountClass) => {
             });
         });
         observer.observe(imgContainer, { childList: true });
+    });
+}
+
+const uploadNotification = (uploadBtnId) => {
+    const uploadBtn = document.getElementById(uploadBtnId);
+    uploadBtn.addEventListener('click', function () {
+        const notification = document.createElement('div');
+        notification.className = 'notification is-info is-light';
+        notification.style.width = '80%';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('delete');
+        deleteBtn.onclick = function () { this.parentElement.style.display = 'none'; };
+        notification.appendChild(deleteBtn);
+        const p = document.createElement('p');
+        p.innerHTML = 'Please do not close or refresh the page. It may take a while to upload images.';
+        notification.appendChild(p);
+        uploadBtn.parentElement.insertBefore(notification, uploadBtn);
     });
 }
 

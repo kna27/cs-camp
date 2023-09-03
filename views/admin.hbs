@@ -44,7 +44,7 @@
             <input type="file" id="fileInput" class="input" name="scavenger_hunt" accept="image/*" style="width: 75vw"
                 multiple>
             <div id="scavenger-hunt-preview" class="mt-5 mb-3"></div>
-            <button type="submit" class="button is-primary">Upload</button>
+            <button type="submit" class="button is-primary" id="upload-img-btn">Upload</button>
         </form>
         <h3 class="mt-3">Previously Uploaded Images</h3>
         <div id="uploaded-images" class="mb-5 img-count">
@@ -72,6 +72,7 @@
     deleteImage("delete-img-family-scav-hunt", "container-family-scav-hunt", null);
     compressImages("fileInput");
     imageCount("img-count");
+    uploadNotification("upload-img-btn");
 </script>
 <script>
     document.addEventListener('mouseover', function (e) {
